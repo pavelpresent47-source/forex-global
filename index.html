@@ -170,7 +170,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // আপনার প্রোজেক্টের আসল ফায়ারবেস কনফিগারেশন কোড
         const firebaseConfig = {
             apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
             authDomain: "forexglobal-95dfc.firebaseapp.com",
@@ -180,71 +179,51 @@
             appId: "1:87470977908:web:4b7f316b372327ffa87221"
         };
         
-        // ফায়ারবেস ইনিশিয়ালাইজ করা
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // মোডাল পপ-আপ ওপেন/ক্লোজ করার ফাংশন
         function openModal(id) { document.getElementById(id).style.display = "block"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
-        // ১. অ্যাকাউন্ট রেজিস্ট্রেশন হ্যান্ডলার
         document.getElementById('registerForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
-
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    const user = userCredential.user;
-                    // ফায়ারস্টোর ডাটাবেজে ইউজারের প্রাথমিক তথ্য সেভ করা
-                    return db.collection("users").doc(user.uid).set({
-                        fullName: name,
-                        email: email,
-                        balance: 0,
-                        plan: "None",
-                        uid: user.uid
+                    return db.collection("users").doc(userCredential.user.uid).set({
+                        fullName: name, email: email, balance: 0, plan: "None", uid: userCredential.user.uid
                     });
                 })
-                .then(() => {
-                    alert("Account Created Successfully!");
-                    closeModal('registerModal');
-                })
+                .then(() => { alert("Account Created!"); closeModal('registerModal'); })
                 .catch((error) => { alert("Error: " + error.message); });
         });
 
-        // ২. ইউজার লগইন হ্যান্ডলার
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    alert("Logged In Successfully!");
-                    closeModal('loginModal');
-                })
+                .then(() => { alert("Logged In!"); closeModal('loginModal'); })
                 .catch((error) => { alert("Error: " + error.message); });
         });
 
-        // ৩. রিয়েল-টাইম ইউজার সেশন ও ব্যালেন্স চেক (Auth State Listener)
         auth.onAuthStateChanged((user) => {
             const authSection = document.getElementById('authSection');
             if (user) {
-                // ইউজার লগইন থাকলে ডাটাবেজ থেকে তার ব্যালেন্স ও নাম নিয়ে আসা
                 db.collection("users").doc(user.uid).onSnapshot((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
                         authSection.innerHTML = `
-                            <span style="margin-right:15px; color:#00f2fe; font-weight:bold;">Hi, ${userData.fullName} ($${userData.balance})</span>
-                            <button class="btn-login" style="background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:5px 15px; border-radius:15px; cursor:pointer; font-weight:bold;" onclick="auth.signOut()">Logout</button>
+                            <span style="margin-right:10px; color:#00f2fe; font-weight:bold;">Hi, ${userData.fullName} ($${userData.balance})</span>
+                            <button onclick="window.location.href='withdraw.html'" style="background:#ff4757; color:white; border:none; padding:5px 10px; border-radius:15px; cursor:pointer; font-weight:bold; margin-right:5px;">Withdraw</button>
+                            <button style="background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:5px 15px; border-radius:15px; cursor:pointer; font-weight:bold;" onclick="auth.signOut()">Logout</button>
                         `;
                     }
                 });
             } else {
-                // ইউজার লগআউট থাকলে সাধারণ লগইন/রেজিস্টার বাটন দেখানো
                 authSection.innerHTML = `
                     <button class="btn-login" style="background:transparent; border:none; color:white; margin-right:15px; cursor:pointer;" onclick="openModal('loginModal')">Login</button>
                     <button class="btn-register" style="background: linear-gradient(45deg, #0d6efd, #00f2fe); color: #fff; padding: 8px 20px; border-radius: 20px; border:none; font-weight: bold; cursor:pointer;" onclick="openModal('registerModal')">Register</button>
@@ -252,16 +231,9 @@
             }
         });
 
-        // ৪. ইনভেস্ট বাটনে ক্লিক করার আপডেট লজিক (সরাসরি পেমেন্ট পেজে রিডাইরেক্ট)
         function investPlan(planName, price) {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please Login First to Invest!");
-                openModal('loginModal');
-            } else {
-                // পপ-আপ মেসেজ না দেখিয়ে সরাসরি payment.html পেজে নিয়ে যাবে
-                window.location.href = "payment.html";
-            }
+            if (!auth.currentUser) { alert("Please Login First!"); openModal('loginModal'); }
+            else { window.location.href = "payment.html"; }
         }
     </script>
 </body>
