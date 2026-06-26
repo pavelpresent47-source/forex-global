@@ -252,14 +252,15 @@
             }
         });
 
-        // ৪. ইনভেস্ট বাটনে ক্লিক করার লজিক
+        // ৪. ইনভেস্ট বাটনে ক্লিক করার আপডেট লজিক (সরাসরি পেমেন্ট পেজে রিডাইরেক্ট)
         function investPlan(planName, price) {
             const user = auth.currentUser;
             if (!user) {
                 alert("Please Login First to Invest!");
                 openModal('loginModal');
             } else {
-                alert(`You selected ${planName} Plan ($${price}). Admin will verify your payment request!`);
+                // পপ-আপ মেসেজ না দেখিয়ে সরাসরি payment.html পেজে নিয়ে যাবে
+                window.location.href = "payment.html";
             }
         }
     </script>
