@@ -3,97 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment - Forex Global</title>
+    <title>Payment | Forex Global</title>
     <style>
-        body {
-            background-color: #0b132b;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .payment-box {
-            background-color: #1c2541;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        h2 { color: #00b4d8; margin-bottom: 20px; }
-        .method {
-            background-color: #3a506b;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        .method strong { color: #ffb703; }
-        .input-group {
-            margin-top: 20px;
-            text-align: left;
-        }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #cbd5e1; }
-        input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #5c677d;
-            background-color: #0b132b;
-            color: #fff;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-        }
-        .btn-submit {
-            background-color: #00b4d8;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            width: 100%;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-submit:hover { background-color: #0077b6; }
+        body { background: #0b132b; color: white; font-family: sans-serif; padding: 20px; }
+        .payment-box { background: #1c2541; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
+        .number-box { background: #0d6efd; padding: 10px; margin: 5px 0; border-radius: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin: 15px 0; border-radius: 5px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #00f2fe; color: #0b132b; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="payment-box">
-    <h2>Make Payment</h2>
-    <p>নিচের যেকোনো একটি নাম্বারে <b>$100 (১২,০০০ টাকা)</b> Send Money করুন:</p>
+    <h2 style="text-align:center;">Send Payment</h2>
+    <p>Please send money to any of the numbers below:</p>
+    <div class="number-box">Bkash: 01727-469215</div>
+    <div class="number-box">Nagad: 01600787628</div>
+    <div class="number-box">Rocket: 01600787628</div>
     
-    <!-- বিকাশ তথ্য -->
-    <div class="method">
-        <strong>bKash (Personal):</strong> 017XXXXXXXX <br>
-        <small>ধাপ: সেন্ড মানি > নাম্বার দিন > পরিমাণ দিন</small>
-    </div>
-
-    <!-- নগদ তথ্য -->
-    <div class="method">
-        <strong>Nagad (Personal):</strong> 019XXXXXXXX <br>
-        <small>ধাপ: সেন্ড মানি > নাম্বার দিন > পরিমাণ দিন</small>
-    </div>
-
-    <!-- সাবমিট ফর্ম -->
-    <form action="javascript:alert('পেমেন্ট রিকোয়েস্ট সফলভাবে জমা হয়েছে! আপনার অ্যাকাউন্টটি ২৪ ঘণ্টার মধ্যে অ্যাক্টিভ হবে।')">
-        <div class="input-group">
-            <label for="number">আপনার বিকাশ/নগদ নাম্বার:</label>
-            <input type="tel" id="number" placeholder="01XXXXXXXXX" required>
-            
-            <label for="txid">Transaction ID (TxID):</label>
-            <input type="text" id="txid" placeholder="8X92KLOPS" required>
-        </div>
-        <button type="submit" class="btn-submit">Submit Payment</button>
-    </form>
+    <input type="text" id="txid" placeholder="Enter Transaction ID (TxID)" required>
+    <button onclick="submitPayment()">Submit Payment Request</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // আপনার ফায়ারবেস কনফিগারেশন
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
+        authDomain: "forexglobal-95dfc.firebaseapp.com",
+        projectId: "forexglobal-95dfc",
+        storageBucket: "forexglobal-95dfc.firebasestorage.app",
+        messagingSenderId: "87470977908",
+        appId: "1:87470977908:web:4b7f316b372327ffa87221"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    async function submitPayment() {
+        const txid = document.getElementById('txid').value;
+        const user = auth.currentUser;
+        
+        if(!txid) { alert("Please enter Transaction ID"); return; }
+        if(!user) { alert("Please login first"); return; }
+
+        try {
+            await db.collection("pending_payments").add({
+                uid: user.uid,
+                email: user.email,
+                txid: txid,
+                amount: 500, // এখানে আপনার প্ল্যান অনুযায়ী অ্যামাউন্ট পরিবর্তন করে নেবেন
+                status: "pending",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Payment Request Submitted! Waiting for admin approval.");
+            document.getElementById('txid').value = ""; // ফর্ম খালি করার জন্য
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+</script>
 </body>
 </html>
