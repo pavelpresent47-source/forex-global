@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Forex Global</title>
+    <style>
+        body { background: #0b132b; color: white; padding: 20px; font-family: sans-serif; }
+        .card { background: #1c2541; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #00f2fe; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
+        h2 { text-align: center; color: #00f2fe; }
+    </style>
+</head>
+<body>
+
+    <h2>Pending Payments</h2>
+    <div id="pendingList">Loading requests...</div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ফায়ারবেস কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
+            authDomain: "forexglobal-95dfc.firebaseapp.com",
+            projectId: "forexglobal-95dfc",
+            storageBucket: "forexglobal-95dfc.firebasestorage.app",
+            messagingSenderId: "87470977908",
+            appId: "1:87470977908:web:4b7f316b372327ffa87221"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // রিয়েল-টাইমে পেন্ডিং পেমেন্ট চেক করা
+        db.collection("pending_payments").where("status", "==", "pending").onSnapshot(snapshot => {
+            let container = document.getElementById('pendingList');
+            container.innerHTML = "";
+            
+            if (snapshot.empty) {
+                container.innerHTML = "<p style='text-align:center;'>No pending payments found.</p>";
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                container.innerHTML += `
+                    <div class="card">
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>TxID:</strong> ${data.txid}</p>
+                        <p><strong>Amount:</strong> $${data.amount}</p>
+                        <button onclick="approve('${doc.id}', '${data.uid}', ${data.amount})">Approve Payment</button>
+                    </div>`;
+            });
+        });
+
+        // অ্যাপ্রুভ ফাংশন
+        async function approve(docId, uid, amount) {
+            try {
+                const userRef = db.collection("users").doc(uid);
+                
+                // ট্রানজেকশনের মাধ্যমে ব্যালেন্স আপডেট
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    const currentBalance = userDoc.exists ? (userDoc.data().balance || 0) : 0;
+                    
+                    transaction.update(userRef, { balance: currentBalance + amount });
+                    transaction.update(db.collection("pending_payments").doc(docId), { status: "approved" });
+                });
+
+                alert("Successfully Approved!");
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
