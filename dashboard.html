@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Global Profit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Dashboard Specific Styles */
+        .dashboard-page {
+            background: var(--bg-dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Top Bar */
+        .dashboard-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--bg-light-dark);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-topbar .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .dashboard-topbar .logo span {
+            color: var(--accent-color);
+        }
+
+        .dashboard-topbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-topbar .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .dashboard-topbar .user-info .name {
+            font-weight: 600;
+        }
+
+        .dashboard-topbar .user-info .email {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        /* Stats Cards */
+        .stats-grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-light-dark);
+            padding: 20px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 242, 254, 0.05);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-icon.blue { color: var(--primary-blue); }
+        .stat-card .stat-icon.green { color: var(--success-green); }
+        .stat-card .stat-icon.gold { color: var(--warning-yellow); }
+        .stat-card .stat-icon.pink { color: var(--danger-red); }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .stat-card .stat-change {
+            font-size: 12px;
+            margin-top: 8px;
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .stat-card .stat-change.positive {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success-green);
+        }
+
+        .stat-card .stat-change.negative {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger-red);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quick-action-btn {
+            background: var(--bg-light-dark);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            color: var(--text-white);
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-color);
+            box-shadow: 0 5px 20px rgba(0, 242, 254, 0.1);
+        }
+
+        .quick-action-btn i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .quick-action-btn .action-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .quick-action-btn.deposit i { color: var(--success-green); }
+        .quick-action-btn.withdraw i { color: var(--danger-red); }
+        .quick-action-btn.refer i { color: var(--warning-yellow); }
+        .quick-action-btn.earn i { color: var(--accent-color); }
+
+        /* Recent Activity */
+        .activity-section {
+            background: var(--bg-light-dark);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .activity-section .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .activity-section .section-header h3 {
+            font-size: 20px;
+        }
+
+        .activity-section .section-header .view-all {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .activity-section .section-header .view-all:hover {
+            text-decoration: underline;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(11, 19, 43, 0.5);
+            border-radius: 10px;
+            border-left: 3px solid var(--text-muted);
+            transition: 0.3s;
+        }
+
+        .activity-item:hover {
+            background: rgba(11, 19, 43, 0.8);
+        }
+
+        .activity-item .activity-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-item .activity-left .activity-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .activity-item .activity-left .activity-icon.deposit {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success-green);
+        }
+
+        .activity-item .activity-left .activity-icon.withdraw {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger-red);
+        }
+
+        .activity-item .activity-left .activity-icon.invest {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--accent-color);
+        }
+
+        .activity-item .activity-left .activity-icon.referral {
+            background: rgba(255, 165, 2, 0.15);
+            color: var(--warning-yellow);
+        }
+
+        .activity-item .activity-left .activity-icon.earn {
+            background: rgba(13, 110, 253, 0.15);
+            color: var(--primary-blue);
+        }
+
+        .activity-item .activity-info .activity-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .activity-item .activity-info .activity-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .activity-item .activity-amount {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .activity-item .activity-amount.positive {
+            color: var(--success-green);
+        }
+
+        .activity-item .activity-amount.negative {
+            color: var(--danger-red);
+        }
+
+        .activity-item .activity-status {
+            font-size: 11px;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .activity-item .activity-status.pending {
+            background: rgba(255, 165, 2, 0.15);
+            color: var(--warning-yellow);
+        }
+
+        .activity-item .activity-status.approved {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success-green);
+        }
+
+        .activity-item .activity-status.rejected {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger-red);
+        }
+
+        .activity-item .border-deposit { border-left-color: var(--success-green); }
+        .activity-item .border-withdraw { border-left-color: var(--danger-red); }
+        .activity-item .border-invest { border-left-color: var(--accent-color); }
+        .activity-item .border-referral { border-left-color: var(--warning-yellow); }
+        .activity-item .border-earn { border-left-color: var(--primary-blue); }
+
+        /* Referral Section */
+        .referral-section {
+            background: var(--bg-light-dark);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .referral-section .referral-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .referral-section .referral-code {
+            background: rgba(11, 19, 43, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--accent-color);
+            border: 2px dashed rgba(0, 242, 254, 0.2);
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .referral-section .referral-code .copy-code {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .referral-section .referral-code .copy-code:hover {
+            background: var(--accent-color);
+            color: var(--bg-dark);
+        }
+
+        .referral-section .referral-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .referral-section .referral-stats .stat {
+            text-align: center;
+        }
+
+        .referral-section .referral-stats .stat .number {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .referral-section .referral-stats .stat .label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .referral-section .share-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .referral-section .share-btns .share-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .referral-section .share-btns .share-btn.whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .referral-section .share-btns .share-btn.facebook {
+            background: #1877F2;
+            color: white;
+        }
+
+        .referral-section .share-btns .share-btn.copy-link {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+        }
+
+        .referral-section .share-btns .share-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* No Data */
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+
+        .no-data i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-topbar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .dashboard-topbar .user-info {
+                justify-content: center;
+            }
+
+            .stats-grid-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .referral-section .referral-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .referral-section .referral-code {
+                font-size: 18px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .referral-section .referral-stats {
+                justify-content: center;
+            }
+
+            .referral-section .share-btns {
+                justify-content: center;
+            }
+
+            .activity-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .activity-item .activity-amount {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid-dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 20px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .quick-action-btn {
+                padding: 15px;
+            }
+
+            .quick-action-btn i {
+                font-size: 24px;
+            }
+
+            .dashboard-topbar {
+                padding: 12px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-page">
+    <div class="dashboard-container">
+
+        <!-- Top Bar -->
+        <div class="dashboard-topbar">
+            <div class="logo">Global <span>Profit</span></div>
+            <div class="user-info" id="userInfo">
+                <div class="avatar" id="userAvatar">G</div>
+                <div>
+                    <div class="name" id="userName">Loading...</div>
+                    <div class="email" id="userEmail">loading@email.com</div>
+                </div>
+                <button class="btn-logout" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid-dashboard" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-wallet"></i></div>
+                <div class="stat-value" id="totalBalance">৳0</div>
+                <div class="stat-label">Total Balance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="stat-value" id="totalInvest">৳0</div>
+                <div class="stat-label">Total Investment</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold"><i class="fas fa-coins"></i></div>
+                <div class="stat-value" id="totalProfit">৳0</div>
+                <div class="stat-label">Total Profit</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon pink"><i class="fas fa-users"></i></div>
+                <div class="stat-value" id="totalReferrals">0</div>
+                <div class="stat-label">Total Referrals</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="payment.html" class="quick-action-btn deposit">
+                <i class="fas fa-plus-circle"></i>
+                <span class="action-label">Deposit</span>
+            </a>
+            <a href="#" class="quick-action-btn withdraw" onclick="openWithdrawModal()">
+                <i class="fas fa-arrow-up"></i>
+                <span class="action-label">Withdraw</span>
+            </a>
+            <a href="index.html#earn" class="quick-action-btn earn">
+                <i class="fas fa-play-circle"></i>
+                <span class="action-label">Watch Ads</span>
+            </a>
+            <a href="#" class="quick-action-btn refer" onclick="shareReferral()">
+                <i class="fas fa-share-alt"></i>
+                <span class="action-label">Refer & Earn</span>
+            </a>
+        </div>
+
+        <!-- Referral Section -->
+        <div class="referral-section" id="referralSection">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-link"></i> Referral Program</h3>
+            <div class="referral-box">
+                <div class="referral-code">
+                    <span id="referralCode">------</span>
+                    <button class="copy-code" onclick="copyReferralCode()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="referral-stats">
+                    <div class="stat">
+                        <div class="number" id="refTotal">0</div>
+                        <div class="label">Total Referrals</div>
+                    </div>
+                    <div class="stat">
+                        <div class="number" id="refBonus">৳0</div>
+                        <div class="label">Referral Bonus</div>
+                    </div>
+                </div>
+                <div class="share-btns">
+                    <button class="share-btn whatsapp" onclick="shareWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="share-btn facebook" onclick="shareFacebook()">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                    <button class="share-btn copy-link" onclick="copyReferralLink()">
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-section" style="margin-top:25px;">
+            <div class="section-header">
+                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <span style="color: var(--text-muted); font-size:13px;">Last 10 transactions</span>
+            </div>
+            <div class="activity-list" id="activityList">
+                <div class="no-data">
+                    <i class="fas fa-inbox"></i>
+                    <p>No activity yet. Start investing today!</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('withdrawModal')">&times;</span>
+        <h2><i class="fas fa-arrow-up"></i> Withdraw Money</h2>
+        <form id="withdrawForm">
+            <div class="balance-info" style="margin-bottom:15px; text-align:center; background:rgba(46,213,115,0.1); padding:10px; border-radius:8px;">
+                <p style="margin:0; color:var(--success-green);">
+                    <i class="fas fa-wallet"></i> Available: ৳<span id="withdrawBalance">0</span>
+                </p>
+            </div>
+            <input type="number" id="withdrawAmount" placeholder="Amount (Min 500)" min="500" required>
+            <select id="withdrawMethod" required>
+                <option value="">Select Method</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Rocket">Rocket</option>
+            </select>
+            <input type="text" id="withdrawAccount" placeholder="Account Number" required>
+            <button type="submit" class="btn-primary" style="width:100%; padding:12px; margin-top:10px; font-size:16px;">
+                <i class="fas fa-check-circle"></i> Request Withdraw
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--success-green); color:white; padding:12px 25px; border-radius:10px; font-weight:600; font-size:14px; box-shadow:0 5px 20px rgba(46,213,115,0.3); z-index:9999; animation:slideUp 0.3s ease;">
+    <i class="fas fa-check-circle"></i> <span id="toastMessage">Copied!</span>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
+        authDomain: "forexglobal-95dfc.firebaseapp.com",
+        projectId: "forexglobal-95dfc",
+        storageBucket: "forexglobal-95dfc.firebasestorage.app",
+        messagingSenderId: "87470977908",
+        appId: "1:87470977908:web:4b7f316b372327ffa87221"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let userData = null;
+    let referralCode = '';
+
+    // ==========================================
+    // TOAST NOTIFICATION
+    // ==========================================
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        toastMessage.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    }
+
+    // ==========================================
+    // MODAL FUNCTIONS
+    // ==========================================
+    function openModal(id) { document.getElementById(id).style.display = 'block'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+    function logoutUser() {
+        auth.signOut().then(() => {
+            window.location.href = 'index.html';
+        });
+    }
+
+    // ==========================================
+    // COPY REFERRAL CODE
+    // ==========================================
+    function copyReferralCode() {
+        const code = document.getElementById('referralCode').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            showToast(`Copied: ${code}`);
+        });
+    }
+
+    // ==========================================
+    // COPY REFERRAL LINK
+    // ==========================================
+    function copyReferralLink() {
+        const code = document.getElementById('referralCode').textContent;
+        const link = `${window.location.origin}/index.html?ref=${code}`;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('Referral link copied!');
+        });
+    }
+
+    // ==========================================
+    // SHARE WHATSAPP
+    // ==========================================
+    function shareWhatsApp() {
+        const code = document.getElementById('referralCode').textContent;
+        const msg = `Join Global Profit and earn daily profit! Use my referral code: ${code}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // ==========================================
+    // SHARE FACEBOOK
+    // ==========================================
+    function shareFacebook() {
+        const code = document.getElementById('referralCode').textContent;
+        const link = `${window.location.origin}/index.html?ref=${code}`;
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank');
+    }
+
+    // ==========================================
+    // SHARE REFERRAL (from main page)
+    // ==========================================
+    function shareReferral() {
+        const code = document.getElementById('referralCode').textContent;
+        const link = `${window.location.origin}/index.html?ref=${code}`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Join Global Profit',
+                text: `Invest with Global Profit and earn daily profit! Use my referral code: ${code}`,
+                url: link
+            });
+        } else {
+            navigator.clipboard.writeText(link).then(() => {
+                showToast('Referral link copied! Share it with your friends.');
+            });
+        }
+    }
+
+    // ==========================================
+    // OPEN WITHDRAW MODAL
+    // ==========================================
+    function openWithdrawModal() {
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        document.getElementById('withdrawBalance').textContent = userData ? (userData.balance || 0) + (userData.earnBalance || 0) : 0;
+        openModal('withdrawModal');
+    }
+
+    // ==========================================
+    // WITHDRAW FORM SUBMIT
+    // ==========================================
+    document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!currentUser) {
+            alert('Please login first!');
+            return;
+        }
+
+        const amount = parseInt(document.getElementById('withdrawAmount').value);
+        const method = document.getElementById('withdrawMethod').value;
+        const account = document.getElementById('withdrawAccount').value;
+
+        if (amount < 500) {
+            alert('Minimum withdrawal is ৳500!');
+            return;
+        }
+
+        const totalBalance = (userData.balance || 0) + (userData.earnBalance || 0);
+        if (amount > totalBalance) {
+            alert('Insufficient balance!');
+            return;
+        }
+
+        try {
+            await db.collection('withdrawals').add({
+                userId: currentUser.uid,
+                amount: amount,
+                method: method,
+                account: account,
+                status: 'pending',
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: new Date().toISOString()
+            });
+
+            // Deduct balance
+            let remaining = amount;
+            if (userData.balance >= remaining) {
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: firebase.firestore.FieldValue.increment(-remaining)
+                });
+            } else {
+                const needFromEarn = remaining - userData.balance;
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: 0,
+                    earnBalance: firebase.firestore.FieldValue.increment(-needFromEarn)
+                });
+            }
+
+            alert('Withdrawal request submitted successfully!');
+            closeModal('withdrawModal');
+            document.getElementById('withdrawForm').reset();
+            location.reload();
+
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+
+    // ==========================================
+    // LOAD DASHBOARD DATA
+    // ==========================================
+    async function loadDashboard(user) {
+        try {
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (!doc.exists) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            userData = doc.data();
+            referralCode = userData.referralCode || '------';
+
+            // User Info
+            document.getElementById('userName').textContent = userData.fullName || 'User';
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userAvatar').textContent = (userData.fullName || 'U')[0].toUpperCase();
+
+            // Stats
+            const balance = (userData.balance || 0) + (userData.earnBalance || 0);
+            document.getElementById('totalBalance').textContent = `৳${balance}`;
+            document.getElementById('totalInvest').textContent = `৳${userData.totalInvest || 0}`;
+            document.getElementById('totalProfit').textContent = `৳0`; // Will calculate from investments
+
+            // Referral
+            document.getElementById('referralCode').textContent = referralCode;
+            
+            // Get referral stats
+            const refSnapshot = await db.collection('users')
+                .where('referredBy', '==', referralCode)
+                .get();
+            const refCount = refSnapshot.size;
+            document.getElementById('refTotal').textContent = refCount;
+            document.getElementById('totalReferrals').textContent = refCount;
+
+            // Get referral bonus
+            const bonusSnapshot = await db.collection('referralBonuses')
+                .where('referrerId', '==', user.uid)
+                .get();
+            let totalBonus = 0;
+            bonusSnapshot.forEach(doc => { totalBonus += doc.data().amount || 0; });
+            document.getElementById('refBonus').textContent = `৳${totalBonus}`;
+
+            // Load Activity
+            await loadActivity(user.uid);
+
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+        }
+    }
+
+    // ==========================================
+    // LOAD RECENT ACTIVITY
+    // ==========================================
+    async function loadActivity(userId) {
+        const activityList = document.getElementById('activityList');
+
+        try {
+            // Get all transactions from different collections
+            const [deposits, withdrawals, investments, adViews] = await Promise.all([
+                db.collection('deposits').where('userId', '==', userId).orderBy('date', 'desc').limit(10).get(),
+                db.collection('withdrawals').where('userId', '==', userId).orderBy('date', 'desc').limit(10).get(),
+                db.collection('investments').where('userId', '==', userId).orderBy('date', 'desc').limit(10).get(),
+                db.collection('adViews').where('userId', '==', userId).orderBy('date', 'desc').limit(10).get()
+            ]);
+
+            let activities = [];
+
+            deposits.forEach(doc => {
+                const data = doc.data();
+                activities.push({
+                    type: 'deposit',
+                    title: `Deposit via ${data.method}`,
+                    amount: data.amount,
+                    status: data.status,
+                    date: data.date ? data.date.toDate() : new Date(),
+                    icon: 'deposit',
+                    border: 'border-deposit'
+                });
+            });
+
+            withdrawals.forEach(doc => {
+                const data = doc.data();
+                activities.push({
+                    type: 'withdraw',
+                    title: `Withdraw via ${data.method}`,
+                    amount: -data.amount,
+                    status: data.status,
+                    date: data.date ? data.date.toDate() : new Date(),
+                    icon: 'withdraw',
+                    border: 'border-withdraw'
+                });
+            });
+
+            investments.forEach(doc => {
+                const data = doc.data();
+                activities.push({
+                    type: 'invest',
+                    title: `Invested in ${data.plan}`,
+                    amount: -data.amount,
+                    status: data.status || 'approved',
+                    date: data.date ? data.date.toDate() : new Date(),
+                    icon: 'invest',
+                    border: 'border-invest'
+                });
+            });
+
+            adViews.forEach(doc => {
+                const data = doc.data();
+                activities.push({
+                    type: 'earn',
+                    title: `Watched ${data.adName}`,
+                    amount: data.amount,
+                    status: 'approved',
+                    date: data.date ? data.date.toDate() : new Date(),
+                    icon: 'earn',
+                    border: 'border-earn'
+                });
+            });
+
+            // Sort by date (newest first)
+            activities.sort((a, b) => b.date - a.date);
+            activities = activities.slice(0, 10);
+
+            if (activities.length === 0) {
+                activityList.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No activity yet. Start investing today!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            activityList.innerHTML = activities.map(item => {
+                const dateStr = item.date.toLocaleDateString('en-BD', { 
+                    day: '2-digit', 
+                    month: 'short', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const amountClass = item.amount > 0 ? 'positive' : 'negative';
+                const amountStr = item.amount > 0 ? `+৳${item.amount}` : `-৳${Math.abs(item.amount)}`;
+
+                const statusMap = {
+                    'pending': 'pending',
+                    'approved': 'approved',
+                    'rejected': 'rejected'
+                };
+                const statusClass = statusMap[item.status] || 'pending';
+
+                return `
+                    <div class="activity-item ${item.border}">
+                        <div class="activity-left">
+                            <div class="activity-icon ${item.icon}">
+                                <i class="fas ${item.type === 'deposit' ? 'fa-arrow-down' : item.type === 'withdraw' ? 'fa-arrow-up' : item.type === 'invest' ? 'fa-chart-line' : 'fa-play'}"></i>
+                            </div>
+                            <div class="activity-info">
+                                <div class="activity-title">${item.title}</div>
+                                <div class="activity-date">${dateStr}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="activity-amount ${amountClass}">${amountStr}</span>
+                            <span class="activity-status ${statusClass}">${item.status}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Error loading activity:', error);
+            activityList.innerHTML
