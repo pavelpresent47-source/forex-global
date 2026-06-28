@@ -3,34 +3,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment | Forex Global</title>
+    <title>Deposit - Global Profit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #0b132b; color: white; font-family: sans-serif; padding: 20px; }
-        .payment-box { background: #1c2541; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
-        .number-box { background: #0d6efd; padding: 10px; margin: 5px 0; border-radius: 5px; font-weight: bold; }
-        input { width: 100%; padding: 10px; margin: 15px 0; border-radius: 5px; border: none; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #00f2fe; color: #0b132b; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        /* Payment Page Specific Styles */
+        .payment-page {
+            background-color: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .payment-box {
+            background: var(--bg-light-dark);
+            padding: 40px 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 242, 254, 0.1);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: slideDown 0.5s ease;
+        }
+
+        .payment-box .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .payment-box .logo span {
+            color: var(--accent-color);
+        }
+
+        .payment-box .sub-title {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .payment-box h2 {
+            color: var(--accent-color);
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .payment-box .amount-display {
+            background: rgba(13, 110, 253, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px dashed rgba(0, 242, 254, 0.3);
+        }
+
+        .payment-box .amount-display h3 {
+            font-size: 32px;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .payment-box .amount-display p {
+            color: var(--text-muted);
+            margin: 5px 0 0 0;
+            font-size: 13px;
+        }
+
+        .payment-methods {
+            margin: 20px 0;
+        }
+
+        .method-card {
+            background: rgba(11, 19, 43, 0.6);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .method-card:hover {
+            border-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .method-card.active {
+            border-color: var(--accent-color);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .method-card .icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .method-card .icon.bkash { color: #E2136E; }
+        .method-card .icon.nagad { color: #FF6B00; }
+        .method-card .icon.rocket { color: #7C4DFF; }
+
+        .method-card .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .method-card .info strong {
+            display: block;
+            font-size: 15px;
+        }
+
+        .method-card .info .number {
+            color: var(--accent-color);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .method-card .info .number i {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .method-card .info small {
+            color: var(--text-muted);
+            font-size: 11px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .method-card .radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+
+        .method-card.active .radio {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+        }
+
+        .method-card.active .radio::after {
+            content: "✓";
+            color: var(--bg-dark);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: rgba(13, 110, 253, 0.15);
+            border: none;
+            color: var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: rgba(13, 110, 253, 0.3);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: rgba(46, 213, 115, 0.2);
+            color: var(--success-green);
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .input-group label i {
+            margin-right: 5px;
+            color: var(--accent-color);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(13, 110, 253, 0.2);
+            background: rgba(11, 19, 43, 0.8);
+            color: var(--text-white);
+            font-size: 15px;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.05);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .payment-note {
+            background: rgba(255, 165, 2, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid var(--warning-yellow);
+        }
+
+        .payment-note p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .payment-note i {
+            color: var(--warning-yellow);
+            margin-right: 8px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-color));
+            color: white;
+            padding: 14px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 25px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 10px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-back:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .balance-info {
+            text-align: center;
+            padding: 10px;
+            background: rgba(46, 213, 115, 0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+        }
+
+        .balance-info p {
+            margin: 0;
+            color: var(--success-green);
+            font-size: 14px;
+        }
+
+        .balance-info p i {
+            margin-right: 5px;
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        .status-message.success {
+            display: block;
+            background: rgba(46, 213, 115, 0.15);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .status-message.error {
+            display: block;
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        .status-message.info {
+            display: block;
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-green);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(46, 213, 115, 0.3);
+            z-index: 9999;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .payment-box {
+                padding: 25px 18px;
+            }
+
+            .payment-box .amount-display h3 {
+                font-size: 26px;
+            }
+
+            .method-card {
+                padding: 12px 15px;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .method-card .icon {
+                font-size: 22px;
+                width: 32px;
+            }
+
+            .method-card .info .number {
+                font-size: 13px;
+            }
+
+            .method-card .info strong {
+                font-size: 14px;
+            }
+
+            .copy-btn {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="payment-box">
-    <h2 style="text-align:center;">Send Payment</h2>
-    <p>Please send money to any of the numbers below:</p>
-    <div class="number-box">Bkash: 01727-469215</div>
-    <div class="number-box">Nagad: 01600787628</div>
-    <div class="number-box">Rocket: 01600787628</div>
-    
-    <input type="text" id="txid" placeholder="Enter Transaction ID (TxID)" required>
-    <button onclick="submitPayment()">Submit Payment Request</button>
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle"></i> <span id="toastMessage">Copied!</span>
 </div>
 
+<div class="payment-page">
+    <div class="payment-box">
+        <!-- Logo -->
+        <div class="logo">Global <span>Profit</span></div>
+        <div class="sub-title">Secure Deposit System</div>
+
+        <!-- Balance Info -->
+        <div class="balance-info" id="balanceInfo">
+            <p><i class="fas fa-wallet"></i> Current Balance: ৳<span id="currentBalance">0</span></p>
+        </div>
+
+        <!-- Amount Display -->
+        <div class="amount-display">
+            <h3 id="displayAmount">৳200</h3>
+            <p>Minimum Deposit: ৳200</p>
+        </div>
+
+        <h2><i class="fas fa-hand-holding-usd"></i> Make Deposit</h2>
+
+        <!-- Payment Methods with Copy Button -->
+        <div class="payment-methods">
+            <!-- bKash -->
+            <div class="method-card active" onclick="selectMethod('bKash')" data-method="bKash">
+                <div class="icon bkash"><i class="fas fa-mobile-alt"></i></div>
+                <div class="info">
+                    <strong>bKash (Personal)</strong>
+                    <div class="number">
+                        <span id="bkashNumber">01727469215</span>
+                        <button class="copy-btn" onclick="event.stopPropagation(); copyNumber('01727469215', this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <small>Send Money to this number</small>
+                </div>
+                <div class="radio"></div>
+            </div>
+
+            <!-- Nagad -->
+            <div class="method-card" onclick="selectMethod('Nagad')" data-method="Nagad">
+                <div class="icon nagad"><i class="fas fa-mobile-alt"></i></div>
+                <div class="info">
+                    <strong>Nagad (Personal)</strong>
+                    <div class="number">
+                        <span id="nagadNumber">01600787628</span>
+                        <button class="copy-btn" onclick="event.stopPropagation(); copyNumber('01600787628', this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <small>Send Money to this number</small>
+                </div>
+                <div class="radio"></div>
+            </div>
+
+            <!-- Rocket -->
+            <div class="method-card" onclick="selectMethod('Rocket')" data-method="Rocket">
+                <div class="icon rocket"><i class="fas fa-rocket"></i></div>
+                <div class="info">
+                    <strong>Rocket (Personal)</strong>
+                    <div class="number">
+                        <span id="rocketNumber">01600787628</span>
+                        <button class="copy-btn" onclick="event.stopPropagation(); copyNumber('01600787628', this)">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <small>Send Money to this number</small>
+                </div>
+                <div class="radio"></div>
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Deposit Form -->
+        <form id="depositForm">
+            <div class="input-group">
+                <label for="depositAmount"><i class="fas fa-money-bill-wave"></i> Amount (BDT):</label>
+                <input type="number" id="depositAmount" placeholder="Enter amount (Min 200)" min="200" required>
+            </div>
+
+            <div class="input-group">
+                <label for="senderNumber"><i class="fas fa-phone"></i> Your Account Number:</label>
+                <input type="tel" id="senderNumber" placeholder="01XXXXXXXXX" required>
+            </div>
+
+            <div class="input-group">
+                <label for="transactionId"><i class="fas fa-hashtag"></i> Transaction ID (TxID):</label>
+                <input type="text" id="transactionId" placeholder="e.g. 8X92KLOPS" required>
+            </div>
+
+            <div class="payment-note">
+                <p><i class="fas fa-info-circle"></i> Make sure to send the exact amount to the selected method. Include the Transaction ID correctly.</p>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-check-circle"></i> Submit Deposit Request
+            </button>
+        </form>
+
+        <a href="index.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<!-- Firebase Scripts -->
 <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
 
 <script>
-    // আপনার ফায়ারবেস কনফিগারেশন
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
         authDomain: "forexglobal-95dfc.firebaseapp.com",
@@ -44,28 +560,225 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    async function submitPayment() {
-        const txid = document.getElementById('txid').value;
-        const user = auth.currentUser;
+    let selectedMethod = 'bKash';
+    let currentUser = null;
+
+    // ==========================================
+    // COPY NUMBER FUNCTION
+    // ==========================================
+    function copyNumber(number, button) {
+        // Copy to clipboard
+        navigator.clipboard.writeText(number).then(() => {
+            // Show toast
+            showToast(`Copied: ${number}`);
+            
+            // Button animation
+            button.classList.add('copied');
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            
+            setTimeout(() => {
+                button.classList.remove('copied');
+                button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            }, 2000);
+        }).catch(() => {
+            // Fallback for older browsers
+            const input = document.createElement('input');
+            input.value = number;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            showToast(`Copied: ${number}`);
+        });
+    }
+
+    // ==========================================
+    // TOAST NOTIFICATION
+    // ==========================================
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        toastMessage.textContent = message;
+        toast.classList.add('show');
         
-        if(!txid) { alert("Please enter Transaction ID"); return; }
-        if(!user) { alert("Please login first"); return; }
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    // ==========================================
+    // SELECT PAYMENT METHOD
+    // ==========================================
+    function selectMethod(method) {
+        selectedMethod = method;
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.classList.remove('active');
+            if (card.dataset.method === method) {
+                card.classList.add('active');
+            }
+        });
+    }
+
+    // ==========================================
+    // SHOW STATUS MESSAGE
+    // ==========================================
+    function showStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('statusMessage');
+        statusDiv.className = `status-message ${type}`;
+        statusDiv.textContent = message;
+        setTimeout(() => {
+            statusDiv.className = 'status-message';
+        }, 6000);
+    }
+
+    // ==========================================
+    // AUTH STATE CHECK
+    // ==========================================
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            try {
+                const doc = await db.collection("users").doc(user.uid).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('currentBalance').textContent = (data.balance || 0) + (data.earnBalance || 0);
+                }
+            } catch (error) {
+                console.error("Error fetching balance:", error);
+            }
+        } else {
+            showStatus('Please login first to make a deposit!', 'error');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+    });
+
+    // ==========================================
+    // AMOUNT INPUT UPDATE
+    // ==========================================
+    document.getElementById('depositAmount').addEventListener('input', function() {
+        let amount = parseInt(this.value) || 0;
+        const display = document.getElementById('displayAmount');
+        if (amount < 200 && amount > 0) {
+            display.textContent = `৳${amount} (Minimum 200)`;
+            display.style.color = '#ff4757';
+        } else if (amount === 0) {
+            display.textContent = '৳200';
+            display.style.color = '#00f2fe';
+        } else {
+            display.textContent = `৳${amount}`;
+            display.style.color = '#00f2fe';
+        }
+    });
+
+    // ==========================================
+    // DEPOSIT FORM SUBMIT
+    // ==========================================
+    document.getElementById('depositForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!currentUser) {
+            showStatus('Please login first!', 'error');
+            return;
+        }
+
+        const amount = parseInt(document.getElementById('depositAmount').value);
+        const senderNumber = document.getElementById('senderNumber').value;
+        const transactionId = document.getElementById('transactionId').value;
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Validation
+        if (!amount || amount < 200) {
+            showStatus('⚠️ Minimum deposit amount is ৳200!', 'error');
+            return;
+        }
+
+        if (!senderNumber || senderNumber.length < 11) {
+            showStatus('⚠️ Please enter a valid phone number!', 'error');
+            return;
+        }
+
+        if (!transactionId || transactionId.length < 4) {
+            showStatus('⚠️ Please enter a valid Transaction ID!', 'error');
+            return;
+        }
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
 
         try {
-            await db.collection("pending_payments").add({
-                uid: user.uid,
-                email: user.email,
-                txid: txid,
-                amount: 500, // এখানে আপনার প্ল্যান অনুযায়ী অ্যামাউন্ট পরিবর্তন করে নেবেন
-                status: "pending",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            // Check if transaction ID already exists
+            const existingTx = await db.collection('deposits')
+                .where('trxId', '==', transactionId)
+                .get();
+
+            if (!existingTx.empty) {
+                showStatus('❌ This Transaction ID already exists! Please check and try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Deposit Request';
+                return;
+            }
+
+            // Save deposit request to Firestore
+            await db.collection('deposits').add({
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                amount: amount,
+                method: selectedMethod,
+                senderNumber: senderNumber,
+                trxId: transactionId,
+                status: 'pending',
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: new Date().toISOString()
             });
-            alert("Payment Request Submitted! Waiting for admin approval.");
-            document.getElementById('txid').value = ""; // ফর্ম খালি করার জন্য
+
+            // Show success message
+            showStatus(`✅ Deposit request of ৳${amount} submitted successfully! Your account will be updated within 24 hours after admin approval.`, 'success');
+
+            // Reset form
+            document.getElementById('depositForm').reset();
+            document.getElementById('displayAmount').textContent = '৳200';
+
+            // Update balance display
+            const doc = await db.collection("users").doc(currentUser.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('currentBalance').textContent = (data.balance || 0) + (data.earnBalance || 0);
+            }
+
         } catch (error) {
-            alert("Error: " + error.message);
+            console.error("Error submitting deposit:", error);
+            showStatus('❌ Error: ' + error.message, 'error');
         }
-    }
+
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit Deposit Request';
+    });
+
+    // ==========================================
+    // AUTO-FILL FROM URL & REDIRECT CHECK
+    // ==========================================
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const amount = params.get('amount');
+        if (amount) {
+            document.getElementById('depositAmount').value = amount;
+            document.getElementById('depositAmount').dispatchEvent(new Event('input'));
+        }
+
+        // Check auth and redirect if not logged in
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        });
+    };
 </script>
+
 </body>
 </html>
