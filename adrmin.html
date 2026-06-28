@@ -3,77 +3,992 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Forex Global</title>
+    <title>Admin Panel - Global Profit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #0b132b; color: white; padding: 20px; font-family: sans-serif; }
-        .card { background: #1c2541; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #00f2fe; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
-        h2 { text-align: center; color: #00f2fe; }
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0b132b;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: #1c2541;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .admin-header .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .admin-header .logo span {
+            color: #00f2fe;
+        }
+
+        .admin-header .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .admin-info .badge {
+            background: #00f2fe;
+            color: #0b132b;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .admin-header .admin-info .logout-btn {
+            background: transparent;
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .admin-header .admin-info .logout-btn:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        /* ===== STATS ===== */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #1c2541;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 242, 254, 0.2);
+        }
+
+        .stat-card .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00f2fe;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: #a5a5a5;
+            margin-top: 5px;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card.pending .stat-icon { color: #ffa502; }
+        .stat-card.users .stat-icon { color: #00f2fe; }
+        .stat-card.total .stat-icon { color: #2ed573; }
+        .stat-card.withdraw .stat-icon { color: #ff4757; }
+        .stat-card.blocked .stat-icon { color: #ff4757; }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            background: #1c2541;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-header h3 {
+            font-size: 20px;
+        }
+
+        .section-header h3 i {
+            color: #00f2fe;
+            margin-right: 10px;
+        }
+
+        .section-header .count-badge {
+            background: rgba(0, 242, 254, 0.15);
+            color: #00f2fe;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #0b132b;
+            padding: 15px 20px;
+            margin: 8px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #00f2fe;
+            transition: 0.3s;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 15px rgba(0, 242, 254, 0.05);
+        }
+
+        .card .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .card .card-info .name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .card .card-info .detail {
+            font-size: 13px;
+            color: #a5a5a5;
+        }
+
+        .card .card-info .detail i {
+            margin-right: 5px;
+            width: 16px;
+        }
+
+        .card .card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-green {
+            background: #2ed573;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #26de81;
+        }
+
+        .btn-red {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: #ff6b81;
+        }
+
+        .btn-blue {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background: #3d8bfd;
+        }
+
+        .btn-yellow {
+            background: #ffa502;
+            color: white;
+        }
+
+        .btn-yellow:hover {
+            background: #ffbe2e;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #a5a5a5;
+        }
+
+        .btn-outline:hover {
+            border-color: #00f2fe;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 165, 2, 0.15);
+            color: #ffa502;
+        }
+
+        .status-badge.approved {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+        }
+
+        .status-badge.rejected {
+            background: rgba(255, 71, 87, 0.15);
+            color: #ff4757;
+        }
+
+        .status-badge.blocked {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .status-badge.active {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #a5a5a5;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+
+        /* ===== TABS ===== */
+        .tab-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: #a5a5a5;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 242, 254, 0.15);
+            color: #00f2fe;
+        }
+
+        .tab-btn i {
+            margin-right: 8px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: #1c2541;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #00f2fe;
+        }
+
+        .modal-content .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: #a5a5a5;
+            transition: 0.3s;
+        }
+
+        .modal-content .close-modal:hover {
+            color: #ff4757;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 2px solid rgba(13, 110, 253, 0.2);
+            background: #0b132b;
+            color: white;
+            font-size: 15px;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: #00f2fe;
+        }
+
+        .modal-content .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        /* ===== SETTINGS ===== */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .settings-card {
+            background: #0b132b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .settings-card h4 {
+            margin-bottom: 10px;
+            color: #00f2fe;
+        }
+
+        .settings-card input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(13, 110, 253, 0.2);
+            background: #1c2541;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        /* ===== TOAST ===== */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2ed573;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(46, 213, 115, 0.3);
+            z-index: 99999;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        #toast.show {
+            display: block;
+        }
+
+        #toast.error {
+            background: #ff4757;
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .card .card-actions {
+                justify-content: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .tab-container {
+                justify-content: center;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card .stat-number {
+                font-size: 20px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .tab-btn {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Pending Payments</h2>
-    <div id="pendingList">Loading requests...</div>
+<!-- Toast -->
+<div id="toast"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+<div class="admin-container">
 
-    <script>
-        // ফায়ারবেস কনফিগারেশন
-        const firebaseConfig = {
-            apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
-            authDomain: "forexglobal-95dfc.firebaseapp.com",
-            projectId: "forexglobal-95dfc",
-            storageBucket: "forexglobal-95dfc.firebasestorage.app",
-            messagingSenderId: "87470977908",
-            appId: "1:87470977908:web:4b7f316b372327ffa87221"
-        };
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="logo">Global <span>Profit</span> <span style="font-size:14px; color:#a5a5a5; font-weight:normal;">Admin Panel</span></div>
+        <div class="admin-info">
+            <span class="badge"><i class="fas fa-shield-alt"></i> Admin</span>
+            <button class="logout-btn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="admin-stats" id="adminStats">
+        <div class="stat-card pending">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-number" id="pendingCount">0</div>
+            <div class="stat-label">Pending Deposits</div>
+        </div>
+        <div class="stat-card withdraw">
+            <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="stat-number" id="withdrawCount">0</div>
+            <div class="stat-label">Pending Withdrawals</div>
+        </div>
+        <div class="stat-card users">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number" id="userCount">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card total">
+            <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+            <div class="stat-number" id="totalBalance">৳0</div>
+            <div class="stat-label">Total Platform Balance</div>
+        </div>
+        <div class="stat-card blocked">
+            <div class="stat-icon"><i class="fas fa-ban"></i></div>
+            <div class="stat-number" id="blockedCount">0</div>
+            <div class="stat-label">Blocked Users</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('deposits')"><i class="fas fa-hand-holding-usd"></i> Deposits</button>
+        <button class="tab-btn" onclick="switchTab('withdrawals')"><i class="fas fa-arrow-up"></i> Withdrawals</button>
+        <button class="tab-btn" onclick="switchTab('users')"><i class="fas fa-users"></i> Users</button>
+        <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</button>
+    </div>
+
+    <!-- Tab: Deposits -->
+    <div id="tab-deposits" class="tab-content active">
+        <div class="section">
+            <div class="section-header">
+                <h3><i class="fas fa-hand-holding-usd"></i> Deposit Requests</h3>
+                <span class="count-badge" id="depositBadge">0 pending</span>
+            </div>
+            <div id="pendingDeposits">
+                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Withdrawals -->
+    <div id="tab-withdrawals" class="tab-content">
+        <div class="section">
+            <div class="section-header">
+                <h3><i class="fas fa-arrow-up"></i> Withdrawal Requests</h3>
+                <span class="count-badge" id="withdrawBadge">0 pending</span>
+            </div>
+            <div id="pendingWithdrawals">
+                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Users -->
+    <div id="tab-users" class="tab-content">
+        <div class="section">
+            <div class="section-header">
+                <h3><i class="fas fa-users"></i> User Management</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-blue btn-sm" onclick="showAddBalanceModal()"><i class="fas fa-plus"></i> Add Balance</button>
+                    <button class="btn btn-outline btn-sm" onclick="refreshUsers()"><i class="fas fa-sync"></i> Refresh</button>
+                </div>
+            </div>
+            <div id="userList">
+                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading users...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div id="tab-settings" class="tab-content">
+        <div class="section">
+            <div class="section-header">
+                <h3><i class="fas fa-cog"></i> Admin Settings</h3>
+            </div>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h4><i class="fas fa-chart-line"></i> Daily Profit Rate (%)</h4>
+                    <input type="number" id="profitRate" value="1.5" step="0.1">
+                    <button class="btn btn-green" onclick="updateSetting('profitRate')"><i class="fas fa-save"></i> Save</button>
+                </div>
+                <div class="settings-card">
+                    <h4><i class="fas fa-money-bill-wave"></i> Min Deposit (৳)</h4>
+                    <input type="number" id="minDeposit" value="200" step="50">
+                    <button class="btn btn-green" onclick="updateSetting('minDeposit')"><i class="fas fa-save"></i> Save</button>
+                </div>
+                <div class="settings-card">
+                    <h4><i class="fas fa-arrow-up"></i> Min Withdraw (৳)</h4>
+                    <input type="number" id="minWithdraw" value="500" step="50">
+                    <button class="btn btn-green" onclick="updateSetting('minWithdraw')"><i class="fas fa-save"></i> Save</button>
+                </div>
+                <div class="settings-card">
+                    <h4><i class="fas fa-play-circle"></i> Daily Ad Limit</h4>
+                    <input type="number" id="adLimit" value="20" step="5">
+                    <button class="btn btn-green" onclick="updateSetting('adLimit')"><i class="fas fa-save"></i> Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add Balance Modal -->
+<div id="addBalanceModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('addBalanceModal')">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> Add Balance</h2>
+        <form id="addBalanceForm">
+            <select id="balanceUser" required>
+                <option value="">Select User</option>
+            </select>
+            <input type="number" id="balanceAmount" placeholder="Amount (BDT)" min="1" required>
+            <select id="balanceType">
+                <option value="main">Main Balance</option>
+                <option value="earn">Earn Balance</option>
+            </select>
+            <button type="submit" class="btn btn-green"><i class="fas fa-check"></i> Add Balance</button>
+        </form>
+    </div>
+</div>
+
+<!-- Block User Modal -->
+<div id="blockUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('blockUserModal')">&times;</span>
+        <h2><i class="fas fa-ban"></i> Block/Unblock User</h2>
+        <p style="color:#a5a5a5; margin-bottom:15px;">Are you sure you want to change this user's status?</p>
+        <p id="blockUserName" style="font-weight:bold; color:#ff4757;"></p>
+        <p id="blockUserStatus" style="color:#a5a5a5; margin:10px 0;"></p>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-red" style="flex:1;" onclick="confirmBlockUser()"><i class="fas fa-ban"></i> Block</button>
+            <button class="btn btn-green" style="flex:1;" onclick="confirmUnblockUser()"><i class="fas fa-check"></i> Unblock</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="closeModal('blockUserModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // ==========================================
+    // FIREBASE CONFIG
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKgUEN3eCEQIm07JejOr4kM0yOBEGGdR8",
+        authDomain: "forexglobal-95dfc.firebaseapp.com",
+        projectId: "forexglobal-95dfc",
+        storageBucket: "forexglobal-95dfc.firebasestorage.app",
+        messagingSenderId: "87470977908",
+        appId: "1:87470977908:web:4b7f316b372327ffa87221"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let selectedUserId = null;
+    let allUsers = [];
+
+    // ==========================================
+    // TOAST
+    // ==========================================
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        toast.className = 'show';
+        if (type === 'error') toast.classList.add('error');
+        toastMessage.textContent = message;
+        setTimeout(() => { toast.className = ''; }, 3000);
+    }
+
+    // ==========================================
+    // TAB SWITCH
+    // ==========================================
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+    }
 
-        // রিয়েল-টাইমে পেন্ডিং পেমেন্ট চেক করা
-        db.collection("pending_payments").where("status", "==", "pending").onSnapshot(snapshot => {
-            let container = document.getElementById('pendingList');
-            container.innerHTML = "";
-            
-            if (snapshot.empty) {
-                container.innerHTML = "<p style='text-align:center;'>No pending payments found.</p>";
+    // ==========================================
+    // MODAL
+    // ==========================================
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+    function logoutAdmin() {
+        auth.signOut().then(() => {
+            window.location.href = 'index.html';
+        });
+    }
+
+    // ==========================================
+    // LOAD STATS
+    // ==========================================
+    async function loadStats() {
+        try {
+            const usersSnap = await db.collection('users').get();
+            document.getElementById('userCount').textContent = usersSnap.size;
+
+            let totalBal = 0;
+            let blocked = 0;
+            usersSnap.forEach(doc => {
+                const data = doc.data();
+                totalBal += (data.balance || 0) + (data.earnBalance || 0);
+                if (data.blocked) blocked++;
+            });
+            document.getElementById('totalBalance').textContent = `৳${totalBal}`;
+            document.getElementById('blockedCount').textContent = blocked;
+
+            const depositSnap = await db.collection('deposits').where('status', '==', 'pending').get();
+            document.getElementById('pendingCount').textContent = depositSnap.size;
+            document.getElementById('depositBadge').textContent = `${depositSnap.size} pending`;
+
+            const withdrawSnap = await db.collection('withdrawals').where('status', '==', 'pending').get();
+            document.getElementById('withdrawCount').textContent = withdrawSnap.size;
+            document.getElementById('withdrawBadge').textContent = `${withdrawSnap.size} pending`;
+
+        } catch (error) {
+            console.error('Stats error:', error);
+        }
+    }
+
+    // ==========================================
+    // LOAD DEPOSITS
+    // ==========================================
+    function loadDeposits() {
+        db.collection('deposits').where('status', '==', 'pending').orderBy('date', 'desc').onSnapshot(async (snap) => {
+            const container = document.getElementById('pendingDeposits');
+            if (snap.empty) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No pending deposits</p></div>`;
                 return;
             }
 
-            snapshot.forEach(doc => {
+            let html = '';
+            for (const doc of snap.docs) {
                 const data = doc.data();
-                container.innerHTML += `
-                    <div class="card">
-                        <p><strong>Email:</strong> ${data.email}</p>
-                        <p><strong>TxID:</strong> ${data.txid}</p>
-                        <p><strong>Amount:</strong> $${data.amount}</p>
-                        <button onclick="approve('${doc.id}', '${data.uid}', ${data.amount})">Approve Payment</button>
-                    </div>`;
-            });
-        });
+                let userName = 'Unknown';
+                try {
+                    const userDoc = await db.collection('users').doc(data.userId).get();
+                    if (userDoc.exists) userName = userDoc.data().fullName || 'Unknown';
+                } catch(e) {}
 
-        // অ্যাপ্রুভ ফাংশন
-        async function approve(docId, uid, amount) {
-            try {
-                const userRef = db.collection("users").doc(uid);
-                
-                // ট্রানজেকশনের মাধ্যমে ব্যালেন্স আপডেট
-                await db.runTransaction(async (transaction) => {
-                    const userDoc = await transaction.get(userRef);
-                    const currentBalance = userDoc.exists ? (userDoc.data().balance || 0) : 0;
-                    
-                    transaction.update(userRef, { balance: currentBalance + amount });
-                    transaction.update(db.collection("pending_payments").doc(docId), { status: "approved" });
-                });
-
-                alert("Successfully Approved!");
-            } catch (error) {
-                alert("Error: " + error.message);
+                html += `
+                    <div class="card" style="border-left-color: #ffa502;">
+                        <div class="card-info">
+                            <div class="name">${userName}</div>
+                            <div class="detail"><i class="fas fa-envelope"></i> ${data.userEmail || 'No email'}</div>
+                            <div class="detail"><i class="fas fa-money-bill-wave"></i> ৳${data.amount} via ${data.method}</div>
+                            <div class="detail"><i class="fas fa-hashtag"></i> TxID: ${data.trxId || 'N/A'}</div>
+                            <div class="detail"><i class="fas fa-phone"></i> ${data.senderNumber || 'N/A'}</div>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge pending">Pending</span>
+                            <button class="btn btn-green btn-sm" onclick="approveDeposit('${doc.id}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="btn btn-red btn-sm" onclick="rejectDeposit('${doc.id}')"><i class="fas fa-times"></i> Reject</button>
+                        </div>
+                    </div>
+                `;
             }
+            container.innerHTML = html;
+        });
+    }
+
+    // ==========================================
+    // LOAD WITHDRAWALS
+    // ==========================================
+    function loadWithdrawals() {
+        db.collection('withdrawals').where('status', '==', 'pending').orderBy('date', 'desc').onSnapshot(async (snap) => {
+            const container = document.getElementById('pendingWithdrawals');
+            if (snap.empty) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No pending withdrawals</p></div>`;
+                return;
+            }
+
+            let html = '';
+            for (const doc of snap.docs) {
+                const data = doc.data();
+                let userName = 'Unknown';
+                try {
+                    const userDoc = await db.collection('users').doc(data.userId).get();
+                    if (userDoc.exists) userName = userDoc.data().fullName || 'Unknown';
+                } catch(e) {}
+
+                html += `
+                    <div class="card" style="border-left-color: #ff4757;">
+                        <div class="card-info">
+                            <div class="name">${userName}</div>
+                            <div class="detail"><i class="fas fa-envelope"></i> ${data.userEmail || 'No email'}</div>
+                            <div class="detail"><i class="fas fa-money-bill-wave"></i> ৳${data.amount} via ${data.method}</div>
+                            <div class="detail"><i class="fas fa-phone"></i> ${data.account || 'N/A'}</div>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge pending">Pending</span>
+                            <button class="btn btn-green btn-sm" onclick="approveWithdraw('${doc.id}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="btn btn-red btn-sm" onclick="rejectWithdraw('${doc.id}')"><i class="fas fa-times"></i> Reject</button>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        });
+    }
+
+    // ==========================================
+    // APPROVE/REJECT DEPOSITS
+    // ==========================================
+    async function approveDeposit(id) {
+        if (!confirm('Approve this deposit?')) return;
+        try {
+            const doc = await db.collection('deposits').doc(id).get();
+            const data = doc.data();
+            
+            await db.collection('deposits').doc(id).update({ status: 'approved' });
+            await db.collection('users').doc(data.userId).update({
+                balance: firebase.firestore.FieldValue.increment(data.amount)
+            });
+            
+            showToast('✅ Deposit approved! Balance added.');
+            loadStats();
+        } catch (error) {
+            showToast('❌ Error: ' + error.message, 'error');
         }
-    </script>
-</body>
-</html>
+    }
+
+    async function rejectDeposit(id) {
+        if (!confirm('Reject this deposit?')) return;
+        try {
+            await db.collection('deposits').doc(id).update({ status: 'rejected' });
+            showToast('Deposit rejected.');
+            loadStats();
+        } catch (error) {
+            showToast('❌ Error: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // APPROVE/REJECT WITHDRAWALS
+    // ==========================================
+    async function approveWithdraw(id) {
+        if (!confirm('Approve this withdrawal?')) return;
+        try {
+            const doc = await db.collection('withdrawals').doc(id).get();
+            const data = doc.data();
+            
+            await db.collection('withdrawals').doc(id).update({ status: 'approved' });
+            
+            showToast('✅ Withdrawal approved!');
+            loadStats();
+        } catch (error) {
+            showToast('❌ Error: ' + error.message, 'error');
+        }
+    }
+
+    async function rejectWithdraw(id) {
+        if (!confirm('Reject this withdrawal? This will refund the amount.')) return;
+        try {
+            const doc = await db.collection('withdrawals').doc(id).get();
+            const data = doc.data();
+            
+            await db.collection('withdrawals').doc(id).update({ status: 'rejected' });
+            await db.collection('users').doc(data.userId).update({
+                balance: firebase.firestore.FieldValue.increment(data.amount)
+            });
+            
+            showToast('Withdrawal rejected. Balance refunded.');
+            loadStats();
+        } catch (error) {
+            showToast('❌ Error: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // LOAD USERS
+    // ==========================================
+    function loadUsers() {
+        db.collection('users').orderBy('createdAt', 'desc').onSnapshot((snap) => {
+            allUsers = [];
+            const container = document.getElementById('userList');
+            
+            if (snap.empty) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div>`;
+                return;
+            }
+
+            let html = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                const uid
